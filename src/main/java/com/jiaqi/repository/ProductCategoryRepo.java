@@ -1,4 +1,4 @@
-package com.jiaqi.dao;
+package com.jiaqi.repository;
 
 import com.jiaqi.dataobject.ProductCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
