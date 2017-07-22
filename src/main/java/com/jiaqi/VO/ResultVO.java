@@ -4,7 +4,7 @@ package com.jiaqi.VO;
  * The View Object that http Request returns
  */
 
-public class ResultVo<T> {
+public class ResultVO<T> {
     // Status code
     private Integer code;
 

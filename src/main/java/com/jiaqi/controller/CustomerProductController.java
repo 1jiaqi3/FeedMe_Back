@@ -2,11 +2,12 @@ package com.jiaqi.controller;
 
 import com.jiaqi.VO.ProductInfoVO;
 import com.jiaqi.VO.ProductVO;
-import com.jiaqi.VO.ResultVo;
+import com.jiaqi.VO.ResultVO;
 import com.jiaqi.dataobject.ProductCategory;
 import com.jiaqi.dataobject.ProductInfo;
 import com.jiaqi.service.ProductCategoryService;
 import com.jiaqi.service.ProductInfoService;
+import com.jiaqi.utils.ResultVOUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,7 +30,7 @@ public class CustomerProductController {
     private ProductCategoryService productCategoryService;
 
     @GetMapping("/list")
-    public ResultVo list() {
+    public ResultVO list() {
         // Query all products that are up from our DB.
         List<ProductInfo> productInfoList = productInfoService.findUpAll();
 
@@ -60,10 +60,6 @@ public class CustomerProductController {
             productVOList.add(productVO);
         }
 
-        ResultVo resultVo = new ResultVo();
-        resultVo.setCode(0);
-        resultVo.setMsg("Success");
-        resultVo.setData(productVOList);
-        return resultVo;
+        return ResultVOUtil.success(productVOList);
     }
 }
