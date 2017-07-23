@@ -3,6 +3,7 @@ package com.jiaqi.service.impl;
 import com.jiaqi.dataobject.OrderDetail;
 import com.jiaqi.dto.OrderDTO;
 import com.jiaqi.enums.OrderStatusEnum;
+import com.jiaqi.enums.PayStatusEnum;
 import org.aspectj.weaver.ast.Or;
 import org.junit.Assert;
 import org.junit.Test;
@@ -77,10 +78,16 @@ public class OrderServiceImplTest {
 
     @Test
     public void finish() throws Exception {
+        OrderDTO orderDTO = orderService.findOne(ORDER_ID);
+        OrderDTO res = orderService.finish(orderDTO);
+        Assert.assertEquals(OrderStatusEnum.FINISHED.getCode(), res.getOrderStatus());
     }
 
     @Test
     public void paid() throws Exception {
+        OrderDTO orderDTO = orderService.findOne(ORDER_ID);
+        OrderDTO res = orderService.paid(orderDTO);
+        Assert.assertEquals(PayStatusEnum.SUCCESS.getCode(), res.getPayStatus());
     }
 
 }
