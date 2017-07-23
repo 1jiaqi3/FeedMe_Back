@@ -5,6 +5,8 @@ import com.jiaqi.dataobject.OrderMaster;
 import com.jiaqi.dataobject.ProductInfo;
 import com.jiaqi.dto.CartDTO;
 import com.jiaqi.dto.OrderDTO;
+import com.jiaqi.enums.OrderStatusEnum;
+import com.jiaqi.enums.PayStatusEnum;
 import com.jiaqi.enums.ResultEnum;
 import com.jiaqi.exception.SellException;
 import com.jiaqi.repository.OrderDetailRepo;
@@ -51,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
             }
             // Compute the total due
             orderAmount = orderAmount
-                    .add(orderDetail.getProductPrice()
+                    .add(productInfo.getProductPrice()
                             .multiply(new BigDecimal(orderDetail.getProductAmount())));
             // Write orderDetail to DB
             orderDetail.setDetailId(KeyUtil.genUniqueKey());
@@ -62,14 +64,15 @@ public class OrderServiceImpl implements OrderService {
 
         // Write orderMaster to DB
         OrderMaster orderMaster = new OrderMaster();
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+        orderMaster.setOrderStatus(OrderStatusEnum.NEW.getCode());
+        orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
         orderMaster.setOrderId(orderId);
         orderMaster.setOrderAmount(orderAmount);
-        BeanUtils.copyProperties(orderDTO, orderMaster);
         masterRepo.save(orderMaster);
 
         // Decrease the stock
-        List<CartDTO> cartDTOList = new ArrayList<>();
-        orderDTO.getOrderDetailList()
+        List<CartDTO> cartDTOList = orderDTO.getOrderDetailList()
                 .stream()
                 .map(e -> new CartDTO(e.getProductId(), e.getProductAmount()))
                 .collect(Collectors.toList());
