@@ -1,33 +1,28 @@
-package com.jiaqi.dataobject;
+package com.jiaqi.dto;
 
+import com.jiaqi.dataobject.OrderDetail;
 import com.jiaqi.enums.OrderStatusEnum;
 import com.jiaqi.enums.PayStatusEnum;
-import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Created by mac on 22/07/2017.
+ * Created by mac on 23/07/2017.
  */
-@Entity
-@DynamicUpdate
-public class OrderMaster {
-    @Id
+public class OrderDTO {
     private String orderId;
     private String customerName;
     private String customerCell;
     private String customerAddress;
     private String customerOpenid;
     private BigDecimal orderAmount;
-    private Integer orderStatus = OrderStatusEnum.NEW.getCode();
-    private Integer payStatus = PayStatusEnum.WAIT.getCode();
+    private Integer orderStatus;
+    private Integer payStatus;
     private Date createTime;
     private Date updateTime;
+    List<OrderDetail> orderDetailList;
 
     public String getOrderId() {
         return orderId;
@@ -107,5 +102,13 @@ public class OrderMaster {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public List<OrderDetail> getOrderDetailList() {
+        return orderDetailList;
+    }
+
+    public void setOrderDetailList(List<OrderDetail> orderDetailList) {
+        this.orderDetailList = orderDetailList;
     }
 }
