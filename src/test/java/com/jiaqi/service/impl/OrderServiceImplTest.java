@@ -2,11 +2,15 @@ package com.jiaqi.service.impl;
 
 import com.jiaqi.dataobject.OrderDetail;
 import com.jiaqi.dto.OrderDTO;
+import com.jiaqi.enums.OrderStatusEnum;
+import org.aspectj.weaver.ast.Or;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -25,6 +29,7 @@ public class OrderServiceImplTest {
     private OrderServiceImpl orderService;
 
     private final String CUSTOMER_OPENID = "110110";
+    private final String ORDER_ID = "1500783319903201001";
     @Test
     public void create() throws Exception {
         OrderDTO orderDTO = new OrderDTO();
@@ -52,14 +57,22 @@ public class OrderServiceImplTest {
 
     @Test
     public void findOne() throws Exception {
+        OrderDTO res = orderService.findOne(ORDER_ID);
+        Assert.assertEquals(ORDER_ID, res.getOrderId());
     }
 
     @Test
     public void findList() throws Exception {
+        PageRequest request = new PageRequest(0, 2);
+        Page<OrderDTO> orderDTOPage = orderService.findList(CUSTOMER_OPENID, request);
+        Assert.assertNotEquals(0, orderDTOPage.getTotalElements());
     }
 
     @Test
     public void cancel() throws Exception {
+        OrderDTO orderDTO = orderService.findOne(ORDER_ID);
+        OrderDTO res = orderService.cancel(orderDTO);
+        Assert.assertEquals(OrderStatusEnum.CANCEL.getCode(), res.getOrderStatus());
     }
 
     @Test

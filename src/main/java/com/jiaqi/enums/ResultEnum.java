@@ -5,7 +5,12 @@ package com.jiaqi.enums;
  */
 public enum ResultEnum {
     PRODUCT_NOT_EXIST(10, "product not exist"),
-    PRODUCT_STOCK_ERROR(11, "error while pulling from stock");
+    PRODUCT_STOCK_ERROR(11, "error while pulling from stock"),
+    ORDER_NOT_EXIST(12, "order not exist"),
+    ORDERDETAIL_NOT_EXIST(13, "order detail not exist"),
+    ORDER_STATUS_ERROR(14, "order status error"),
+    ORDER_UPDATE_FAIL(15, "order update failure"),
+    ORDER_DATAIL_EMPTY(16, "order detail is empty");
 
     private Integer code;
     private String message;

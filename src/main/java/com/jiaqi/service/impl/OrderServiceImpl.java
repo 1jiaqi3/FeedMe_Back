@@ -1,5 +1,6 @@
 package com.jiaqi.service.impl;
 
+import com.jiaqi.converter.OrderMaster2OrderDTOConverter;
 import com.jiaqi.dataobject.OrderDetail;
 import com.jiaqi.dataobject.OrderMaster;
 import com.jiaqi.dataobject.ProductInfo;
@@ -17,10 +18,12 @@ import com.jiaqi.utils.KeyUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
-import java.awt.print.Pageable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,17 +85,59 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO findOne(String orderId) {
-        return null;
+        OrderMaster orderMaster = masterRepo.findOne(orderId);
+        if (orderMaster == null) {
+            throw new SellException(ResultEnum.ORDER_NOT_EXIST);
+        }
+        List<OrderDetail> orderDetailList = detailRepo.findByOrderId(orderId);
+        if (CollectionUtils.isEmpty(orderDetailList)) {
+            throw new SellException(ResultEnum.ORDERDETAIL_NOT_EXIST);
+        }
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderMaster, orderDTO);
+        orderDTO.setOrderDetailList(orderDetailList);
+        return orderDTO;
     }
 
     @Override
     public Page<OrderDTO> findList(String customerOpenid, Pageable pageable) {
-        return null;
+        Page<OrderMaster> orderMasterPage = masterRepo.findByCustomerOpenid(customerOpenid, pageable);
+
+        List<OrderDTO> orderDTOList = OrderMaster2OrderDTOConverter.convert(orderMasterPage.getContent());
+        return new PageImpl<>(orderDTOList, pageable, orderMasterPage.getTotalElements());
     }
 
     @Override
+    @Transactional
     public OrderDTO cancel(OrderDTO orderDTO) {
-        return null;
+        OrderMaster orderMaster = new OrderMaster();
+
+
+        // Check the status of the order
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
+            throw new SellException(ResultEnum.ORDER_STATUS_ERROR);
+        }
+        // Modify the status of the order
+        orderDTO.setOrderStatus(OrderStatusEnum.CANCEL.getCode());
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+        OrderMaster updateRes = masterRepo.save(orderMaster);
+        if (updateRes == null) {
+            throw new SellException(ResultEnum.ORDER_UPDATE_FAIL);
+        }
+        // roll back the stock
+        if (CollectionUtils.isEmpty(orderDTO.getOrderDetailList())) {
+            throw new SellException(ResultEnum.ORDER_DATAIL_EMPTY);
+        }
+        List<CartDTO> cartDTOList = orderDTO.getOrderDetailList()
+                .stream()
+                .map(e -> new CartDTO(e.getProductId(), e.getProductAmount()))
+                .collect(Collectors.toList());
+        productInfoService.increaseStock(cartDTOList);
+        // if paid, need to refund
+        if (orderDTO.getPayStatus().equals(PayStatusEnum.SUCCESS.getCode())) {
+            //TODO:
+        }
+        return orderDTO;
     }
 
     @Override
