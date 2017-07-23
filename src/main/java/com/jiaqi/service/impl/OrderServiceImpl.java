@@ -68,10 +68,10 @@ public class OrderServiceImpl implements OrderService {
 
         // Write orderMaster to DB
         OrderMaster orderMaster = new OrderMaster();
+        orderDTO.setOrderId(orderId);
         BeanUtils.copyProperties(orderDTO, orderMaster);
         orderMaster.setOrderStatus(OrderStatusEnum.NEW.getCode());
         orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
-        orderMaster.setOrderId(orderId);
         orderMaster.setOrderAmount(orderAmount);
         masterRepo.save(orderMaster);
 

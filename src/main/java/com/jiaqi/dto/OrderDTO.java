@@ -1,16 +1,19 @@
 package com.jiaqi.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jiaqi.dataobject.OrderDetail;
-import com.jiaqi.enums.OrderStatusEnum;
-import com.jiaqi.enums.PayStatusEnum;
+import com.jiaqi.utils.serializer.Date2LongSerializer;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by mac on 23/07/2017.
  */
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderDTO {
     private String orderId;
     private String customerName;
@@ -20,7 +23,9 @@ public class OrderDTO {
     private BigDecimal orderAmount;
     private Integer orderStatus;
     private Integer payStatus;
+    @JsonSerialize(using = Date2LongSerializer.class)
     private Date createTime;
+    @JsonSerialize(using = Date2LongSerializer.class)
     private Date updateTime;
     List<OrderDetail> orderDetailList;
 
